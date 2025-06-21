@@ -26,11 +26,11 @@ plugins/DonationAPI/config.yml
 # API 연결 설정
 api:
   key: "YOUR_API_KEY_HERE"           # 발급받은 API 키
-  url: "https://gitter0.xyz" # API 서버 URL (변경 금지)
+  url: "http://121.145.190.195:3000" # API 서버 URL (변경 금지)
 
 # Socket.IO 연결 설정
 socket:
-  url: "https://gitter0.xyz" # Socket.IO 서버 URL (변경 금지)
+  url: "http://121.145.190.195:3001" # Socket.IO 서버 URL (변경 금지)
   reconnect-interval: 5              # 재연결 간격 (초)
 
 # 이벤트 처리 설정
