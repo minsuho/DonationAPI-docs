@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonationAPI - 문서</title>
+    <script type="module">
+        // marked 설정을 먼저 로드하고 경고 제거
+        import { marked } from 'https://cdn.skypack.dev/marked@5.1.1';
+        
+        // marked 기본 설정
+        marked.setOptions({
+            headerIds: false,
+            headerPrefix: '',
+            breaks: true,
+            gfm: true
+        });
+        
+        // md-block 로드
+        import('https://md-block.verou.me/md-block.js');
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .navigation {
+            background: #f6f8fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .nav-item {
+            background: white;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .nav-item:hover {
+            border-color: #0969da;
+            box-shadow: 0 4px 12px rgba(9, 105, 218, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item.active {
+            border-color: #0969da;
+            background: #f0f7ff;
+        }
+        
+        .nav-item h3 {
+            margin: 0 0 0.5rem 0;
+            color: #0969da;
+            font-size: 1.1rem;
+        }
+        
+        .nav-item p {
+            margin: 0;
+            color: #656d76;
+            font-size: 0.9rem;
+        }
+        
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        md-block {
+            display: block;
+        }
+        
+        md-block h1, md-block h2, md-block h3 {
+            color: #0969da;
+            border-bottom: 1px solid #d0d7de;
+            padding-bottom: 0.3rem;
+        }
+        
+        md-block h1 {
+            font-size: 2rem;
+        }
+        
+        md-block h2 {
+            font-size: 1.5rem;
+        }
+        
+        md-block h3 {
+            font-size: 1.2rem;
+        }
+        
+        md-block code {
+            background: #f6f8fa;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 85%;
+        }
+        
+        md-block pre {
+            background: #f6f8fa;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        
+        md-block pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        md-block table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+        
+        md-block table th,
+        md-block table td {
+            border: 1px solid #d0d7de;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        md-block table th {
+            background: #f6f8fa;
+            font-weight: 600;
+        }
+        
+        md-block blockquote {
+            border-left: 4px solid #0969da;
+            margin: 1rem 0;
+            padding: 0 1rem;
+            color: #656d76;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid #d0d7de;
+            color: #656d76;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🎁 DonationAPI</h1>
+            <p>마인크래프트 후원 연동 플러그인 완전 가이드</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-grid">
+                <div class="nav-item active" data-section="readme">
+                    <h3>🏠 개요</h3>
+                    <p>DonationAPI 플러그인 소개 및 주요 기능</p>
+                </div>
+                <div class="nav-item" data-section="installation">
+                    <h3>📦 설치 가이드</h3>
+                    <p>플러그인 설치 및 초기 설정 방법</p>
+                </div>
+                <div class="nav-item" data-section="configuration">
+                    <h3>⚙️ 설정 가이드</h3>
+                    <p>설정 파일 및 YML 구조 상세 가이드</p>
+                </div>
+                <div class="nav-item" data-section="commands">
+                    <h3>🎮 명령어</h3>
+                    <p>유저 및 관리자 명령어 완전 가이드</p>
+                </div>
+                <div class="nav-item" data-section="events">
+                    <h3>🎪 이벤트 시스템</h3>
+                    <p>이벤트 종류 및 설정 방법</p>
+                </div>
+                <div class="nav-item" data-section="placeholders">
+                    <h3>🏷️ 플레이스홀더</h3>
+                    <p>사용 가능한 모든 플레이스홀더</p>
+                </div>
+                <div class="nav-item" data-section="mission-system">
+                    <h3>🎯 미션 시스템</h3>
+                    <p>숲 도전미션/대결미션 완벽 가이드</p>
+                </div>
+                <div class="nav-item" data-section="addon-development">
+                    <h3>🔧 애드온 개발</h3>
+                    <p>커스텀 애드온 개발 가이드</p>
+                </div>
+                <div class="nav-item" data-section="terms">
+                    <h3>📋 이용약관</h3>
+                    <p>플러그인 이용약관 및 정책</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-section active" id="readme">
+                <md-block src="README.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="installation">
+                <md-block src="installation.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="configuration">
+                <md-block src="configuration.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="commands">
+                <md-block src="commands.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="events">
+                <md-block src="events.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="placeholders">
+                <md-block src="placeholders.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="mission-system">
+                <md-block src="mission-system.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="addon-development">
+                <md-block src="addon-development.md" no-shadow></md-block>
+            </div>
+            
+            <div class="content-section" id="terms">
+                <md-block src="terms.md" no-shadow></md-block>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>© 2024 DonationAPI - 문의: <a href="https://discord.gg/Sr42sSM7kr">Discord</a></p>
+        </div>
+    </div>
+
+    <script>
+        // 네비게이션 기능
+        function initializeNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            function showSection(sectionId) {
+                // 모든 nav-item에서 active 클래스 제거
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 해당 nav-item에 active 클래스 추가
+                const targetNav = document.querySelector(`[data-section="${sectionId}"]`);
+                if (targetNav) targetNav.classList.add('active');
+                
+                // 모든 content-section 숨기기
+                contentSections.forEach(section => section.classList.remove('active'));
+                // 해당 content-section 보이기
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) targetSection.classList.add('active');
+            }
+            
+            // 클릭 이벤트 설정
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            });
+            
+            // 페이지 로드 시 README를 기본으로 표시
+            setTimeout(() => showSection('readme'), 100);
+        }
+        
+        // DOM 로드 완료 후 초기화
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeNavigation);
+        } else {
+            initializeNavigation();
+        }
+    </script>
+</body>
+</html> 
