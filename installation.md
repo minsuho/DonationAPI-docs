@@ -6,14 +6,9 @@ DonationAPI 플러그인의 설치 방법과 초기 설정을 안내합니다.
 
 ### 필수 요구사항
 - **Java**: 17 이상
-- **Minecraft 서버**: Spigot 1.20.1 (1.19 이하는 별도 문의)
+- **Minecraft 서버**: Spigot 1.20.1+ (1.19 이하는 별도 문의)
 - **메모리**: 최소 1GB RAM
 - **네트워크**: 인터넷 연결 (Socket.IO 통신), Velocity 지원
-
-### 지원하지 않는 환경
-- ❌ BungeeCord/Waterfall 네트워크
-- ❌ Bukkit 서버
-- ❌ 1.18 이하 버전 (1.19는 별도 문의)
 
 ## 📥 플러그인 다운로드
 

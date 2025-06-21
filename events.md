@@ -220,6 +220,208 @@ DonationAPI.registerAddon("custom_effect", (player, data, variables) -> {
 });
 ```
 
+### 5. 🎲 랜덤 아이템 이벤트
+
+확률에 따라 다양한 아이템 중 하나를 지급합니다.
+
+#### 설정 방법
+```bash
+# GUI 열기
+/후원관리 이벤트설정 공통 1000 스트리머 랜덤아이템
+```
+
+#### GUI 사용법
+1. **명령어 실행** → 랜덤 아이템 설정 GUI 창 열림
+2. **아이템 추가** → 인벤토리에서 원하는 아이템을 GUI로 드래그
+3. **확률 설정** → 각 아이템의 드롭 확률 설정 (0.1% ~ 100.0%)
+4. **이름 설정** → 아이템 표시 이름 설정 (선택사항)
+5. **저장** → 설정 완료
+
+#### 확률 시스템
+- 전체 확률 합은 100%를 초과할 수 없음
+- 각 아이템마다 개별 확률 설정 가능
+- 남은 확률은 실시간으로 표시
+
+#### 예시 설정
+```yaml
+랜덤 아이템 예시:
+- 다이아몬드 (50% 확률)
+- 황금사과 (30% 확률)  
+- 네더라이트 검 (15% 확률)
+- 용의 알 (5% 확률)
+```
+
+### 6. ⚰️ 즉사 이벤트
+
+대상 플레이어를 즉시 사망시키는 이벤트입니다.
+
+#### 기본 사용법
+```bash
+# 스트리머 즉사
+/후원관리 이벤트설정 공통 1000 스트리머 즉사
+
+# 전체 플레이어 즉사 (위험!)
+/후원관리 이벤트설정 공통 10000 전체 즉사
+
+# 특정 플레이어 즉사
+/후원관리 이벤트설정 steve 5000 steve 즉사
+```
+
+#### 주의사항
+- 하드코어 모드에서는 플레이어가 영구적으로 밴될 수 있음
+- 전체 대상 즉사는 신중하게 사용할 것
+- PvP가 비활성화된 지역에서도 작동함
+
+#### 활용 예시
+```bash
+# 재미있는 벌칙 이벤트
+/후원관리 이벤트설정 공통 5000 스트리머 메시지 &c%donator_name%님의 즉사 벌칙!
+/후원관리 이벤트설정 공통 5000 스트리머 즉사
+
+# 고액 후원자의 장난
+/후원관리 이벤트설정 공통 50000 스트리머 즉사
+```
+
+### 7. 🐱 몹 소환 이벤트
+
+확률에 따라 다양한 몹 중 하나를 소환합니다.
+
+#### 설정 방법
+```bash
+# 기본 몹 소환
+/후원관리 이벤트설정 공통 1000 스트리머 몹소환
+```
+
+#### 시스템 작동 방식
+1. **애니메이션**: 슬롯머신 스타일로 몹 타입이 빠르게 변화
+2. **몹 선택**: 개별 설정된 가중치에 따라 확률적 선택
+3. **소환**: 플레이어 주변 안전한 위치에 몹 소환
+
+#### Config 설정 (config.yml)
+```yaml
+spawn-mob:
+  default:
+    min-count: 1          # 최소 소환 개수
+    max-count: 1          # 최대 소환 개수
+    spawn-radius: 3       # 소환 반경
+    height-offset: 0      # 높이 조정
+    animation:
+      enabled: true       # 애니메이션 활성화
+      duration: 60        # 애니메이션 시간 (틱)
+  
+  # 몹별 개별 설정 (선택사항)
+  mob-specific:
+    ZOMBIE:
+      weight: 10          # 소환 확률 가중치
+      min-count: 1        # 이 몹의 최소 개수
+      max-count: 2        # 이 몹의 최대 개수
+      enabled: true       # 활성화 여부
+      attack-first: true  # 소환 즉시 공격 모드
+      force-target-spawner: true  # 후원받은 플레이어를 우선 타겟
+    PIG:
+      weight: 15
+      min-count: 2
+      max-count: 4
+      enabled: true
+      attack-first: false # 평화로운 몹은 공격 안함
+      force-target-spawner: false
+  
+  # 제외할 몹 목록
+  excluded-entities:
+    - ENDER_DRAGON
+    - WITHER
+    - WARDEN
+  
+  # 고급 설정
+  advanced:
+    max-total-mobs-per-event: 10
+    safe-spawn-check: true
+    avoid-water: true
+    async-spawning: true
+    despawn-time: 300
+```
+
+#### 주요 특징
+- **개별 몹 설정**: 각 몹별로 확률과 소환 개수 조정 가능
+- **공격 설정**: 몹별로 공격 모드와 타겟 설정 가능
+  - `attack-first`: 소환 즉시 공격 모드 활성화
+  - `force-target-spawner`: 후원받은 플레이어를 우선 타겟으로 설정
+- **안전한 소환**: 위험한 위치(물, 용암, 공허) 방지
+- **성능 최적화**: 비동기 소환으로 서버 성능 보호
+- **자동 정리**: 설정된 시간 후 자동 디스폰
+
+#### 안전성
+- 위험한 몹들은 기본적으로 제외 목록에 포함
+- 소환 위치 안전성 검사
+- 서버 성능을 고려한 소환 개수 제한
+- **자연 스폰 몹과 구분**: 후원 이벤트로 소환된 몹만 특별 설정 적용
+
+### 8. ✨ 랜덤 효과 이벤트
+
+확률에 따라 다양한 포션 효과 중 하나를 적용합니다.
+
+#### 설정 방법
+```bash
+# 기본 랜덤 효과
+/후원관리 이벤트설정 공통 1000 스트리머 랜덤효과
+```
+
+#### 시스템 작동 방식
+1. **애니메이션**: 슬롯머신 스타일로 효과 타입이 빠르게 변화
+2. **효과 선택**: 개별 설정된 가중치에 따라 확률적 선택
+3. **적용**: 선택된 포션 효과를 플레이어에게 적용
+
+#### Config 설정 (config.yml)
+```yaml
+random-effect:
+  default:
+    duration: 30          # 기본 지속시간 (초)
+    amplifier: 0          # 기본 강도 (레벨)
+    ambient: false        # 주변 효과 여부
+    particles: true       # 파티클 표시
+    icon: true           # 아이콘 표시
+  
+  # 효과별 개별 설정 (선택사항)
+  effects:
+    SPEED:
+      weight: 15          # 소환 확률 가중치
+      duration: 60        # 지속시간 (초)
+      amplifier: 1        # 효과 강도
+      enabled: true       # 활성화 여부
+    REGENERATION:
+      weight: 8
+      duration: 30
+      amplifier: 0
+      enabled: true
+  
+  # 제외할 효과 목록
+  excluded-effects:
+    - HARM
+    - WITHER
+    - POISON
+    - HUNGER
+  
+  # 고급 설정
+  advanced:
+    allow-duplicate-effects: false
+    replace-existing: true
+    async-application: true
+    conflicting-effects:
+      - [SPEED, SLOWNESS]
+      - [INCREASE_DAMAGE, WEAKNESS]
+```
+
+#### 주요 특징
+- **개별 효과 설정**: 각 포션 효과별로 확률과 지속시간 조정 가능
+- **충돌 방지**: 상반된 효과 동시 적용 방지 (예: 속도↔느려짐)
+- **안전성**: 해로운 효과들은 기본적으로 제외
+- **성능 최적화**: 비동기 효과 적용
+
+#### 안전성
+- 해로운 효과들은 기본적으로 제외 목록에 포함
+- 충돌하는 효과 조합 자동 방지
+- 중복 효과 적용 제어 가능
+
 ## 🎯 대상 시스템
 
 ### 대상 타입
