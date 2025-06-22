@@ -26,11 +26,11 @@ plugins/DonationAPI/config.yml
 # API 연결 설정
 api:
   key: "YOUR_API_KEY_HERE"           # 발급받은 API 키
-  url: "http://121.145.190.195:3000" # API 서버 URL (변경 금지)
+  url: "https://gitter0.xyz" # API 서버 URL (변경 금지)
 
 # Socket.IO 연결 설정
 socket:
-  url: "http://121.145.190.195:3001" # Socket.IO 서버 URL (변경 금지)
+  url: "https://gitter0.xyz" # Socket.IO 서버 URL (변경 금지)
   reconnect-interval: 5              # 재연결 간격 (초)
 
 # 이벤트 처리 설정
@@ -114,7 +114,7 @@ messages:
 ```yaml
 api:
   key: "YOUR_API_KEY_HERE"  # 필수! 디스코드에서 발급받은 API 키
-  url: "http://121.145.190.195:3000"  # 변경하지 마세요
+  url: "https://gitter0.xyz"  # 변경하지 마세요
 ```
 
 #### 이벤트 타입 설정
@@ -318,9 +318,16 @@ UUID를 파일명으로 하는 개별 스트리머 설정 파일입니다.
   command: "CONSOLE:/give %player% diamond 1"
   # 또는
   command: "PLAYER:/heal"
-  # 또는 멀티라인
-  command: "CONSOLE:/give %player% diamond 1\nPLAYER:/heal"
+  # 또는 OP 권한으로 실행
+  command: "OP:/gamemode creative"
+  # 또는 멀티라인 (다양한 권한 레벨 조합)
+  command: "CONSOLE:/give %player% diamond 1\nPLAYER:/heal\nOP:/gamemode creative"
 ```
+
+**명령어 접두사:**
+- `CONSOLE:` - 콘솔에서 실행 (권한 제한 없음)
+- `PLAYER:` - 플레이어 권한으로 실행 (기본값)
+- `OP:` - 임시 OP 권한으로 실행 (명령어 실행 후 원래 상태로 복원)
 
 #### GIVE_ITEM 액션
 ```yaml

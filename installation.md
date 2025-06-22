@@ -63,11 +63,11 @@ plugins/DonationAPI/
 # API 설정
 api:
   key: "YOUR_API_KEY_HERE"    # ← 여기에 발급받은 API 키 입력
-  url: "http://121.145.190.195:3000"
+  url: "https://gitter0.xyz"
   
 # 소켓 설정  
 socket:
-  url: "http://121.145.190.195:3001"
+  url: "https://gitter0.xyz"
   reconnect-interval: 5
 ```
 

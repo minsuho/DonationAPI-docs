@@ -267,6 +267,18 @@ DonationAPI 플러그인의 모든 명령어를 자세히 설명합니다.
 /후원관리 이벤트설정 공통 10000 전체 명령어 CONSOLE:/say %donator_name%님이 %amount%원을 후원하셨습니다!
 ```
 
+**OP 권한 명령어 (OP:)**
+```bash
+# 대상 플레이어가 임시 OP 권한으로 실행
+/후원관리 이벤트설정 공통 1000 스트리머 명령어 OP:/gamemode creative
+
+# 전체 플레이어가 각각 OP 권한으로 실행
+/후원관리 이벤트설정 공통 5000 전체 명령어 OP:/give @s diamond 64
+
+# 여러 OP 명령어 실행
+/후원관리 이벤트설정 공통 10000 스트리머 명령어 OP:/gamemode creative\nOP:/give @s netherite_sword 1
+```
+
 #### 🔧 애드온 이벤트
 
 외부 애드온과 연동하는 이벤트입니다.

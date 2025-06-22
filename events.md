@@ -159,10 +159,31 @@ Golden Apple
 /후원관리 이벤트설정 공통 5000 전체 명령어 CONSOLE:/say %donator_name%님이 %amount%원을 후원하셨습니다!
 ```
 
+**OP 권한 명령어 (OP:)**
+```bash
+# 대상 플레이어가 임시 OP 권한으로 실행
+/후원관리 이벤트설정 공통 1000 스트리머 명령어 OP:/gamemode creative
+
+# 전체 플레이어가 각각 OP 권한으로 실행
+/후원관리 이벤트설정 공통 5000 전체 명령어 OP:/give @s diamond 64
+
+# 특정 플레이어가 OP 권한으로 실행
+/후원관리 이벤트설정 steve 10000 steve 명령어 OP:/summon firework_rocket ~ ~5 ~
+```
+
+> **⚠️ OP 권한 명령어 주의사항**
+> - 대상 플레이어에게 **임시로** OP 권한을 부여하여 명령어를 실행합니다
+> - 명령어 실행 후 **자동으로 원래 권한 상태로 복원**됩니다
+> - OP 권한이 필요한 명령어 (게임모드 변경, 월드에딧 등)에 사용하세요
+> - 보안상 신중하게 사용하시기 바랍니다
+
 #### 멀티 명령어
 ```bash
 # 여러 명령어 실행 (\n으로 구분)
 /후원관리 이벤트설정 공통 5000 스트리머 명령어 PLAYER:/heal\nPLAYER:/feed\nCONSOLE:/give %player% diamond 1
+
+# 다양한 권한 레벨 조합
+/후원관리 이벤트설정 공통 10000 스트리머 명령어 PLAYER:/heal\nOP:/gamemode creative\nCONSOLE:/say %player%님이 특별한 권한을 받았습니다!
 ```
 
 #### 명령어 예시들
@@ -172,6 +193,12 @@ PLAYER:/tp ~ ~100 ~
 
 # 아이템 지급  
 CONSOLE:/give %player% diamond 64
+
+# OP 권한으로 게임모드 변경
+OP:/gamemode creative
+
+# OP 권한으로 자신에게 아이템 지급
+OP:/give @s netherite_sword 1
 
 # 이펙트 부여
 CONSOLE:/effect give %player% speed 30 2
@@ -184,6 +211,9 @@ CONSOLE:/eco give %player% 10000
 
 # 칭호 부여 (ChatColorPlus 등)
 CONSOLE:/title set %player% &6[후원왕]
+
+# OP 권한으로 월드에딧 명령어 사용
+OP://set stone
 ```
 
 ### 4. 🔧 애드온 이벤트
