@@ -1,4 +1,4 @@
-# 🎁 DonationAPI - 후원 연동 플러그인
+# 🎁 DonationAPI - 후원 연동 플러그인 (AI로 생성)
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![Minecraft](https://img.shields.io/badge/minecraft-1.20.1-green.svg)
