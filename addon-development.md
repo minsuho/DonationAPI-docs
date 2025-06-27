@@ -6,6 +6,7 @@ DonationAPI의 애드온 시스템을 활용하여 커스텀 이벤트를 개발
 
 - [애드온 개요](#-애드온-개요)
 - [Action 인터페이스](#-action-인터페이스)
+- [애드온 대상 시스템](#-애드온-대상-시스템)
 - [애드온 개발 단계](#-애드온-개발-단계)
 - [실제 구현 예제](#-실제-구현-예제)
 - [고급 기능](#-고급-기능)
@@ -84,6 +85,248 @@ public class DonationData {
     // Getter 메서드들...
 }
 ```
+
+## 🎯 애드온 대상 시스템
+
+### 애드온 대상이란?
+DonationAPI의 기본 대상(전체, 스트리머) 외에 플러그인이 추가할 수 있는 커스텀 대상 타입입니다.
+
+### 애드온 대상 활용 예시
+- **길드 시스템**: 길드멤버, 길드간부
+- **파티 시스템**: 파티원, 파티장
+- **권한 시스템**: VIP플레이어, 관리자
+- **지역 시스템**: 근처플레이어, 같은월드플레이어
+- **조건부 대상**: 밤시간플레이어, 특정레벨이상
+
+### TargetProvider 인터페이스
+
+```java
+package com.gitter.donationAPI.actions;
+
+import com.gitter.donationAPI.models.DonationData;
+import com.gitter.donationAPI.models.StreamerData;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
+import java.util.Map;
+
+public interface TargetProvider {
+    /**
+     * 대상 타입 이름
+     * @return 대상 타입 이름 (예: "길드멤버", "파티원")
+     */
+    String getTargetType();
+    
+    /**
+     * 대상 플레이어 목록 반환
+     * @param streamer 연동된 스트리머 (Player 객체)
+     * @param streamerData 스트리머 연동 정보 (플랫폼, ID 등)
+     * @param data 후원 데이터
+     * @param variables 설정에서 전달된 추가 변수들
+     * @return 대상 플레이어 목록 (온라인만)
+     */
+    List<Player> getTargetPlayers(Player streamer, StreamerData streamerData, 
+                                 DonationData data, Map<String, String> variables);
+    
+    /**
+     * 대상 타입 설명
+     * @return 사용자에게 표시될 설명
+     */
+    String getDescription();
+    
+    /**
+     * 등록한 플러그인
+     * @return 이 Provider를 등록한 플러그인
+     */
+    Plugin getPlugin();
+    
+    /**
+     * 대상 유효성 검사 (선택사항)
+     * @param streamer 스트리머
+     * @return 현재 상태에서 이 대상을 사용할 수 있는지 여부
+     */
+    default boolean isValid(Player streamer) {
+        return true;
+    }
+    
+    /**
+     * 설정 변수 설명 (선택사항)
+     * @return 이 대상에서 사용 가능한 변수들과 설명
+     */
+    default Map<String, String> getVariableDescriptions() {
+        return Collections.emptyMap();
+    }
+}
+```
+
+### 애드온 대상 등록 방법
+
+```java
+package com.yourname.yourplugin;
+
+import com.gitter.donationAPI.actions.API;
+import com.gitter.donationAPI.actions.TargetProvider;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class YourPlugin extends JavaPlugin {
+    
+    @Override
+    public void onEnable() {
+        // DonationAPI 연동 확인
+        if (getServer().getPluginManager().isPluginEnabled("DonationAPI")) {
+            registerTargetProviders();
+        }
+    }
+    
+    private void registerTargetProviders() {
+        // 길드 멤버 대상 등록
+        boolean success = API.registerTargetProvider(new GuildMemberProvider(this));
+        if (success) {
+            getLogger().info("DonationAPI에 '길드멤버' 대상이 등록되었습니다.");
+        }
+    }
+    
+    @Override
+    public void onDisable() {
+        // DonationAPI 연동 해제
+        if (getServer().getPluginManager().isPluginEnabled("DonationAPI")) {
+            API.unregisterTargetProvider("길드멤버", this);
+        }
+    }
+}
+```
+
+### 실제 구현 예제
+
+#### 길드 시스템 연동
+```java
+public class GuildMemberProvider implements TargetProvider {
+    private final MyGuildPlugin plugin;
+    
+    public GuildMemberProvider(MyGuildPlugin plugin) {
+        this.plugin = plugin;
+    }
+    
+    @Override
+    public String getTargetType() {
+        return "길드멤버";
+    }
+    
+    @Override
+    public List<Player> getTargetPlayers(Player streamer, StreamerData streamerData, 
+                                        DonationData data, Map<String, String> variables) {
+        Guild guild = plugin.getGuildManager().getPlayerGuild(streamer);
+        if (guild == null) {
+            return Collections.emptyList();
+        }
+        
+        // 온라인 길드 멤버들만 반환
+        return guild.getMembers().stream()
+            .map(Bukkit::getPlayer)
+            .filter(Objects::nonNull)
+            .filter(Player::isOnline)
+            .collect(Collectors.toList());
+    }
+    
+    @Override
+    public String getDescription() {
+        return "스트리머와 같은 길드의 온라인 멤버들";
+    }
+    
+    @Override
+    public Plugin getPlugin() {
+        return plugin;
+    }
+    
+    @Override
+    public boolean isValid(Player streamer) {
+        return plugin.getGuildManager().getPlayerGuild(streamer) != null;
+    }
+}
+```
+
+#### 조건부 대상 (VIP 플레이어)
+```java
+public class VIPTargetProvider implements TargetProvider {
+    private final Plugin plugin;
+    
+    @Override
+    public String getTargetType() {
+        return "VIP플레이어";
+    }
+    
+    @Override
+    public List<Player> getTargetPlayers(Player streamer, StreamerData streamerData, 
+                                        DonationData data, Map<String, String> variables) {
+        // 최소 후원 금액 확인
+        String minAmountStr = variables.getOrDefault("min_amount", "0");
+        int minAmount = Integer.parseInt(minAmountStr);
+        
+        // 조건을 만족하지 않으면 빈 리스트 반환 (이벤트 스킵됨)
+        if (data.getAmount() < minAmount) {
+            return Collections.emptyList();
+        }
+        
+        // 플랫폼별 다른 VIP 권한 처리
+        String vipPermission = switch (streamerData.getPlatform()) {
+            case "CHZZK" -> "rank.chzzk.vip";
+            case "SOOP" -> "rank.soop.vip";
+            default -> "rank.vip";
+        };
+        
+        // VIP 권한을 가진 온라인 플레이어들 반환
+        return Bukkit.getOnlinePlayers().stream()
+            .filter(p -> p.hasPermission(vipPermission))
+            .collect(Collectors.toList());
+    }
+    
+    @Override
+    public String getDescription() {
+        return "VIP 권한을 가진 온라인 플레이어들 (플랫폼별 권한 지원)";
+    }
+    
+    @Override
+    public Map<String, String> getVariableDescriptions() {
+        return Map.of("min_amount", "최소 후원 금액 (이상일 때만 실행)");
+    }
+}
+```
+
+### 사용법
+
+#### 기본 사용
+```bash
+# 길드 멤버들에게 메시지 전송
+/후원관리 이벤트설정 공통 5000 길드멤버 메시지 길드원들에게 후원 알림!
+
+# VIP 플레이어들에게 아이템 지급
+/후원관리 이벤트설정 공통 10000 VIP플레이어 아이템
+```
+
+#### 변수와 함께 사용
+```bash
+# 10000원 이상 후원시에만 VIP들에게 이벤트 실행
+/후원관리 이벤트설정 공통 5000 VIP플레이어 명령어 CONSOLE:/say VIP 이벤트 실행!
+# 설정 파일에서 variables 추가:
+# variables:
+#   min_amount: "10000"
+```
+
+#### 대상 목록 확인
+```bash
+# 등록된 모든 대상 타입 확인
+/후원관리 대상목록
+```
+
+### 주요 특징
+
+- **자동 통합**: 명령어 자동완성에 자동으로 추가됨
+- **실시간 처리**: 매번 이벤트 실행시 최신 대상 목록 조회
+- **안전한 관리**: 플러그인 비활성화시 자동으로 Provider 제거
+- **변수 지원**: 동적 설정을 통한 유연한 대상 처리
+- **조건부 실행**: 빈 리스트 반환시 이벤트 자동 스킵
+- **플랫폼별 처리**: 스트리머 정보를 활용한 플랫폼별 다른 처리
 
 ## 🛠️ 애드온 개발 단계
 
